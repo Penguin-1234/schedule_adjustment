@@ -76,7 +76,8 @@ class _AcceptScreenState extends State<AcceptScreen>
     return slots;
   }
 
-  /// 空いている候補日を分割単位ごとに抽出
+
+  /// 空いている候補日を分割単位ごとに抽出する
   void _parseAndFilter() {
     final text = _textController.text;
     final candidates = parseCandidateText(text);
