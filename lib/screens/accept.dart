@@ -142,28 +142,100 @@ class _AcceptScreenState extends State<AcceptScreen>
     const labels = ['月', '火', '水', '木', '金', '土', '日'];
     return labels[(weekday - 1) % 7];
   }
+  
+  // /// 指定日の予定を取得
+  // List<calendar.Event> _getEventsForDay(DateTime day) {
+  //   return widget.allEvents.where((event) {
+  //     final eventStart = event.start?.dateTime?.toLocal() ?? event.start?.date;
+  //     if (eventStart == null) return false;
 
+  //     return eventStart.year == day.year &&
+  //         eventStart.month == day.month &&
+  //         eventStart.day == day.day;
+  //   }).toList();
+  // }
+
+  // /// 候補日時間帯と重なる予定を取得
+  // List<calendar.Event> _getConflictingEvents(DateTimeRange range) {
+  //   return widget.allEvents.where((event) {
+  //     final eventStart = event.start?.dateTime?.toLocal();
+  //     final eventEnd = event.end?.dateTime?.toLocal();
+
+  //     if (eventStart == null || eventEnd == null) return false;
+
+  //     return range.start.isBefore(eventEnd) && eventStart.isBefore(range.end);
+  //   }).toList();
+  // }
+  
   /// 指定日の予定を取得
   List<calendar.Event> _getEventsForDay(DateTime day) {
     return widget.allEvents.where((event) {
-      final eventStart = event.start?.dateTime?.toLocal() ?? event.start?.date;
-      if (eventStart == null) return false;
-
-      return eventStart.year == day.year &&
-          eventStart.month == day.month &&
-          eventStart.day == day.day;
+      // 時刻指定の予定の場合
+      final eventDateTime = event.start?.dateTime?.toLocal();
+      if (eventDateTime != null) {
+        return eventDateTime.year == day.year &&
+            eventDateTime.month == day.month &&
+            eventDateTime.day == day.day;
+      }
+      
+      // 終日予定の場合
+      final eventDate = event.start?.date;
+      if (eventDate != null) {
+        return eventDate.year == day.year &&
+            eventDate.month == day.month &&
+            eventDate.day == day.day;
+      }
+      
+      return false;
     }).toList();
   }
 
   /// 候補日時間帯と重なる予定を取得
   List<calendar.Event> _getConflictingEvents(DateTimeRange range) {
     return widget.allEvents.where((event) {
+      // 時刻指定の予定の場合
       final eventStart = event.start?.dateTime?.toLocal();
       final eventEnd = event.end?.dateTime?.toLocal();
+      
+      if (eventStart != null && eventEnd != null) {
+        return range.start.isBefore(eventEnd) && eventStart.isBefore(range.end);
+      }
+      
+      // 終日予定の場合
+      final eventStartDate = event.start?.date;
+      final eventEndDate = event.end?.date;
+      
+      if (eventStartDate != null && eventEndDate != null) {
+        // 終日予定の日付範囲と指定された時間範囲が重なるかチェック
+        final rangeStartDate = DateTime(range.start.year, range.start.month, range.start.day);
+        final rangeEndDate = DateTime(range.end.year, range.end.month, range.end.day);
+        
+        return rangeStartDate.isBefore(eventEndDate) && 
+              eventStartDate.isBefore(rangeEndDate.add(Duration(days: 1)));
+      }
+      
+      return false;
+    }).toList();
+  }
 
-      if (eventStart == null || eventEnd == null) return false;
+  /// より簡潔な実装（ヘルパー関数を使用）
+  DateTime? _getEventDate(calendar.Event event) {
+    return event.start?.dateTime?.toLocal() ?? event.start?.date;
+  }
 
-      return range.start.isBefore(eventEnd) && eventStart.isBefore(range.end);
+  DateTime? _getEventEndDate(calendar.Event event) {
+    return event.end?.dateTime?.toLocal() ?? event.end?.date;
+  }
+
+  /// 指定日の予定を取得（簡潔版）
+  List<calendar.Event> _getEventsForDaySimple(DateTime day) {
+    return widget.allEvents.where((event) {
+      final eventDate = _getEventDate(event);
+      if (eventDate == null) return false;
+
+      return eventDate.year == day.year &&
+          eventDate.month == day.month &&
+          eventDate.day == day.day;
     }).toList();
   }
 
