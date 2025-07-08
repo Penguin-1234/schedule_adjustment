@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _isSignedIn = false;
-
+  
   @override
   void initState() {
     super.initState();
@@ -94,7 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+              colors: [
+                Color(0xFF667eea),
+                Color(0xFF764ba2),
+              ],
             ),
           ),
           child: Row(
@@ -169,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 30),
                           const Text(
-                            'Welcome!',
+                            'Welcome Back',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -197,9 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFF667eea,
-                                  ).withOpacity(0.3),
+                                  color: const Color(0xFF667eea).withOpacity(0.3),
                                   blurRadius: 20,
                                   offset: const Offset(0, 10),
                                 ),
@@ -250,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         title: const Text(
-          'カレンダー',
+          'Calendar Management',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -259,26 +260,40 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         leading: widget.returnToAcceptScreen
             ? IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color?>((states) {
+                  if (states.contains(MaterialState.hovered)) {
+                    return Colors.white.withOpacity(0.2); // ホバー時の背景
+                  }
+                  return Colors.transparent; // 通常時の背景
+                }),
+                foregroundColor: MaterialStateProperty.resolveWith<Color?>((states) {
+                  if (states.contains(MaterialState.hovered)) {
+                    return Colors.white; // ホバー時の文字色
+                  }
+                  return Colors.white; // 通常時の文字色
+                }),
+
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
                 ),
-                child: const Icon(Icons.note_add_rounded, color: Colors.white),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),side: const BorderSide(
+                      color: Colors.white, // フレームの色
+                      width: 1.5,
+                    ),
+                  )
+                ),
               ),
-              tooltip: '候補日を貼り付け',
               onPressed: () async {
                 final busyRanges = _eventsMap.entries.expand((entry) {
                   return entry.value.map((event) {
@@ -290,12 +305,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     return null;
                   }).whereType<DateTimeRange>();
                 }).toList();
-
+                
                 final allEvents = <calendar.Event>[];
                 for (final eventList in _eventsMap.values) {
                   allEvents.addAll(eventList);
                 }
-
+                
                 final selectedDate = await Navigator.push<DateTime>(
                   context,
                   MaterialPageRoute(
@@ -313,6 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 }
               },
+              child: const Text('候補日を貼り付け'),
             ),
           ),
         ],
@@ -322,7 +338,10 @@ class _HomeScreenState extends State<HomeScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFF8FAFC), Color(0xFFE2E8F0)],
+            colors: [
+              Color(0xFFF8FAFC),
+              Color(0xFFE2E8F0),
+            ],
           ),
         ),
         child: SingleChildScrollView(
@@ -388,83 +407,110 @@ class _HomeScreenState extends State<HomeScreen> {
                       defaultBuilder: (context, day, focusedDay) {
                         final events = _getEventsForDay(day);
                         final isToday = isSameDay(day, DateTime.now());
-
-                        return Container(
-                          margin: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: isToday
-                                ? const Color(0xFF667eea).withOpacity(0.1)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            border: isToday
-                                ? Border.all(
-                                    color: const Color(0xFF667eea),
-                                    width: 2,
-                                  )
-                                : null,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(6),
-                                child: Text(
-                                  '${day.day}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: isToday
-                                        ? const Color(0xFF667eea)
-                                        : const Color(0xFF2c3e50),
-                                  ),
-                                ),
-                              ),
-                              ...events.take(2).map((event) {
-                                final start = event.start?.dateTime?.toLocal();
-                                final time = start != null
-                                    ? DateFormat('HH:mm').format(start)
-                                    : '';
-                                return Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                    vertical: 1,
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFF667eea,
-                                    ).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                        final remainingCount = events.length - 2;
+                        return SizedBox(
+                          width: 100,
+                          height: 100,
+                          child: Container(
+                            margin: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: isToday 
+                                  ? const Color(0xFF667eea).withOpacity(0.1)
+                                  : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              border: isToday
+                                  ? Border.all(
+                                      color: const Color(0xFF667eea),
+                                      width: 2,
+                                    )
+                                  : null,
+                            ),
+                            child: Stack(
+                              //crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                //左上の日付
+                                Positioned(
+                                  //padding: const EdgeInsets.all(6),
+                                  top: 4,
+                                  left: 4,
                                   child: Text(
-                                    time.isNotEmpty
-                                        ? '$time ${event.summary ?? ''}'
-                                        : event.summary ?? '',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontSize: 9,
-                                      color: Color(0xFF667eea),
-                                      fontWeight: FontWeight.w500,
+                                    '${day.day}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: isToday
+                                          ? const Color(0xFF667eea)
+                                          : const Color(0xFF2c3e50),
                                     ),
                                   ),
-                                );
-                              }),
-                            ],
+                                ),
+                                //イベント一覧
+                                //...events.take(2).map((event) {
+                                Positioned.fill(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 22, left: 4, right: 4),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: events.take(2).map((event) {
+                                        final start = event.start?.dateTime?.toLocal();
+                                        final time = start != null
+                                            ? DateFormat('HH:mm').format(start)
+                                            : '';
+                                        return Container(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 4,
+                                            vertical: 1,
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF667eea).withOpacity(0.1),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            time.isNotEmpty ? '$time ${event.summary ?? ''}' : event.summary ?? '',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontSize: 9,
+                                              color: Color(0xFF667eea),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    )
+                                  )
+                                  
+                                ),
+                                //残りのイベント数
+                                if (remainingCount > 0)
+                                  Positioned(
+                                    bottom: 4,
+                                    right: 6,
+                                    child: Text(
+                                      '+$remainingCount',
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF667eea),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
-                        );
+                        );//ここまで
                       },
-
                       selectedBuilder: (context, day, focusedDay) {
                         final events = _getEventsForDay(day);
-
+                        
                         return Container(
                           margin: const EdgeInsets.all(2),
-                          width: 100, // ← カレンダーのrowHeightと同じ値に固定
-                          height: 100, // ← カレンダーのrowHeightと同じ値に固定
+                          width: 100,
+                          height: double.infinity,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFF667eea), Color(0xFF764ba2)],
@@ -479,8 +525,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max, // ← 追加
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
@@ -513,9 +557,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    time.isNotEmpty
-                                        ? '$time ${event.summary ?? ''}'
-                                        : event.summary ?? '',
+                                    time.isNotEmpty ? '$time ${event.summary ?? ''}' : event.summary ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -547,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-
+              
               // 選択された日付と詳細情報
               if (_selectedDay != null)
                 Container(
@@ -565,198 +607,196 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                DateFormat('yyyy年MM月dd日').format(_selectedDay!),
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2c3e50),
-                                ),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              DateFormat('yyyy年MM月dd日').format(_selectedDay!),
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2c3e50),
                               ),
-                              Text(
-                                DateFormat('EEEE', 'ja').format(_selectedDay!),
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                ),
+                            ),
+                            Text(
+                              DateFormat('EEEE', 'ja').format(_selectedDay!),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                            ),
+                            borderRadius: BorderRadius.circular(50),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF667eea).withOpacity(0.3),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
                               ),
                             ],
                           ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                              ),
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(
-                                    0xFF667eea,
-                                  ).withOpacity(0.3),
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.add_rounded,
-                                color: Colors.white,
-                                size: 28,
-                              ),
-                              tooltip: '候補日を追加',
-                              onPressed: () async {
-                                final result = await Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                        ) => RequestScreen(
-                                          selectedDate: _selectedDay!,
-                                        ),
-                                    transitionsBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                          child,
-                                        ) {
-                                          const begin = Offset(1.0, 0.0);
-                                          const end = Offset.zero;
-                                          const curve = Curves.easeInOut;
-                                          final tween = Tween(
-                                            begin: begin,
-                                            end: end,
-                                          ).chain(CurveTween(curve: curve));
-                                          return SlideTransition(
-                                            position: animation.drive(tween),
-                                            child: child,
-                                          );
-                                        },
-                                  ),
-                                );
-                                if (result != null &&
-                                    result is Map<String, DateTime>) {
-                                  setState(() {
-                                    _candidates.add(result);
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-
-                      // 予定一覧
-                      const Text(
-                        '予定',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2c3e50),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      ..._getEventsForDay(_selectedDay!).map((e) {
-                        final dateTime = e.start?.dateTime?.toLocal();
-                        final isAllDay =
-                            e.start?.date != null && e.start?.dateTime == null;
-                        final summary = e.summary ?? 'タイトルなし';
+                      ],
+                    ),
+                    const SizedBox(height: 20),
 
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF667eea).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF667eea).withOpacity(0.3),
-                              width: 1,
-                            ),
+                    const Text(
+                      '予定',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2c3e50),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ..._getEventsForDay(_selectedDay!).map((e) {
+                      final dateTime = e.start?.dateTime?.toLocal();
+                      final isAllDay = e.start?.date != null && e.start?.dateTime == null;
+                      final summary = e.summary ?? 'タイトルなし';
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF667eea).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: const Color(0xFF667eea).withOpacity(0.3),
+                            width: 1,
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 4,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF667eea),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 4,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF667eea),
+                                borderRadius: BorderRadius.circular(2),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    summary,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF2c3e50),
+                                    ),
+                                  ),
+                                  if (dateTime != null || isAllDay)
                                     Text(
-                                      summary,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF2c3e50),
+                                      dateTime != null
+                                          ? DateFormat('HH:mm').format(dateTime)
+                                          : '終日',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[600],
                                       ),
                                     ),
-                                    if (dateTime != null || isAllDay)
-                                      Text(
-                                        dateTime != null
-                                            ? DateFormat(
-                                                'HH:mm',
-                                              ).format(dateTime)
-                                            : '終日',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                  ],
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      }),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
 
-                      if (_getEventsForDay(_selectedDay!).isEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
+                    if (_getEventsForDay(_selectedDay!).isEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.event_available_rounded,
+                              color: Colors.grey[400],
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '予定がありません',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.center,
+                      child: TextButton(
+                        onPressed: () async {
+                          final result = await Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                  RequestScreen(selectedDate: _selectedDay!),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOut;
+                                final tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                          if (result != null && result is Map<String, DateTime>) {
+                            setState(() {
+                              _candidates.add(result);
+                            });
+                          }
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                            (states) => states.contains(MaterialState.hovered)
+                                ? const Color(0xFF764ba2).withOpacity(0.1)
+                                : Colors.transparent,
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.event_available_rounded,
-                                color: Colors.grey[400],
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '予定がありません',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
+                          foregroundColor: MaterialStateProperty.all(const Color(0xFF764ba2)),
+                          padding: MaterialStateProperty.all(
+                            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                          textStyle: MaterialStateProperty.all(const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          )),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: const BorderSide(color: Color(0xFF764ba2), width: 1),
+                            ),
                           ),
                         ),
-
-                      const SizedBox(height: 20),
-
-                      // 候補日一覧
+                        child: const Text('＋ 候補日を追加'),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    if (_candidates.isNotEmpty) ...[
                       const Text(
                         '追加した候補日',
                         style: TextStyle(
@@ -766,36 +806,37 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-
-                      if (_candidates.isNotEmpty) ...[
-                        ..._candidates.map(
-                          (c) => Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF764ba2).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: const Color(0xFF764ba2).withOpacity(0.3),
-                                width: 1,
-                              ),
+                      ..._candidates.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final c = entry.value;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF764ba2).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color(0xFF764ba2).withOpacity(0.3),
+                              width: 1,
                             ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF764ba2),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: const Icon(
-                                    Icons.schedule_rounded,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF764ba2),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                const SizedBox(width: 12),
-                                Text(
+                                child: const Icon(
+                                  Icons.schedule_rounded,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
                                   '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
                                   '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}',
                                   style: const TextStyle(
@@ -804,85 +845,66 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: Color(0xFF2c3e50),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton.icon(
-                            icon: const Icon(Icons.copy_rounded),
-                            label: const Text(
-                              '候補日をコピー',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
                               ),
-                            ),
-                            onPressed: () {
-                              final text = _candidates
-                                  .map(
-                                    (c) =>
-                                        '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
-                                        '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}',
-                                  )
-                                  .join('\n');
-                              Clipboard.setData(ClipboardData(text: text));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text('候補日をコピーしました'),
-                                  backgroundColor: const Color(0xFF667eea),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF667eea),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ] else
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.schedule_rounded,
-                                color: Colors.grey[400],
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '候補日はありません',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey[600],
-                                ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFF764ba2)),
+                                tooltip: 'この候補日を削除',
+                                onPressed: () {
+                                  setState(() {
+                                    _candidates.removeAt(index);
+                                  });
+                                },
                               ),
                             ],
                           ),
+                        );
+                      }),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.copy_rounded),
+                          label: const Text(
+                            '候補日をコピー',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          onPressed: () {
+                            final text = _candidates
+                                .map((c) => '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
+                                    '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}')
+                                .join('\n');
+                            Clipboard.setData(ClipboardData(text: text));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('候補日をコピーしました'),
+                                backgroundColor: const Color(0xFF667eea),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF667eea),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ),
-                    ],
-                  ),
+                      ),
+                      
+                    ]
+                  ],
                 ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
+              ),//column終了
+          ]),
         ),
       ),
     );

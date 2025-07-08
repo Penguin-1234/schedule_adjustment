@@ -12,7 +12,7 @@ class RequestScreen extends StatelessWidget {
     int? endHour;
     int? endMinute;
 
-    final formattedDate = DateFormat('yyyy年MM月dd日').format(selectedDate);
+    final formattedDate = DateFormat('yyyy年MM月dd日（E）','ja').format(selectedDate);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -115,7 +115,7 @@ class RequestScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF10B981).withOpacity(0.3),
+                        color: const Color(0xFF6366F1).withOpacity(0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -154,7 +154,7 @@ class RequestScreen extends StatelessWidget {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF10B981),
+                      backgroundColor: const Color(0xFF667eea),
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
