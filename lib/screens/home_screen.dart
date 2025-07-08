@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   bool _isSignedIn = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -94,10 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF667eea),
-                Color(0xFF764ba2),
-              ],
+              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
             ),
           ),
           child: Row(
@@ -172,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           const SizedBox(height: 30),
                           const Text(
-                            'Welcome Back',
+                            'Welcome!',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -200,7 +197,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF667eea).withOpacity(0.3),
+                                  color: const Color(
+                                    0xFF667eea,
+                                  ).withOpacity(0.3),
                                   blurRadius: 20,
                                   offset: const Offset(0, 10),
                                 ),
@@ -260,7 +259,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         leading: widget.returnToAcceptScreen
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: () => Navigator.pop(context),
               )
             : null,
@@ -288,12 +290,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     return null;
                   }).whereType<DateTimeRange>();
                 }).toList();
-                
+
                 final allEvents = <calendar.Event>[];
                 for (final eventList in _eventsMap.values) {
                   allEvents.addAll(eventList);
                 }
-                
+
                 final selectedDate = await Navigator.push<DateTime>(
                   context,
                   MaterialPageRoute(
@@ -320,10 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFF8FAFC),
-              Color(0xFFE2E8F0),
-            ],
+            colors: [Color(0xFFF8FAFC), Color(0xFFE2E8F0)],
           ),
         ),
         child: SingleChildScrollView(
@@ -389,11 +388,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       defaultBuilder: (context, day, focusedDay) {
                         final events = _getEventsForDay(day);
                         final isToday = isSameDay(day, DateTime.now());
-                        
+
                         return Container(
                           margin: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
-                            color: isToday 
+                            color: isToday
                                 ? const Color(0xFF667eea).withOpacity(0.1)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
@@ -435,11 +434,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     vertical: 2,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF667eea).withOpacity(0.1),
+                                    color: const Color(
+                                      0xFF667eea,
+                                    ).withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    time.isNotEmpty ? '$time ${event.summary ?? ''}' : event.summary ?? '',
+                                    time.isNotEmpty
+                                        ? '$time ${event.summary ?? ''}'
+                                        : event.summary ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -454,11 +457,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       },
+
                       selectedBuilder: (context, day, focusedDay) {
                         final events = _getEventsForDay(day);
-                        
+
                         return Container(
                           margin: const EdgeInsets.all(2),
+                          width: 100, // ← カレンダーのrowHeightと同じ値に固定
+                          height: 100, // ← カレンダーのrowHeightと同じ値に固定
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
                               colors: [Color(0xFF667eea), Color(0xFF764ba2)],
@@ -473,6 +479,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max, // ← 追加
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
@@ -505,7 +513,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    time.isNotEmpty ? '$time ${event.summary ?? ''}' : event.summary ?? '',
+                                    time.isNotEmpty
+                                        ? '$time ${event.summary ?? ''}'
+                                        : event.summary ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
@@ -537,7 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              
+
               // 選択された日付と詳細情報
               if (_selectedDay != null)
                 Container(
@@ -588,7 +598,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(50),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF667eea).withOpacity(0.3),
+                                  color: const Color(
+                                    0xFF667eea,
+                                  ).withOpacity(0.3),
                                   blurRadius: 15,
                                   offset: const Offset(0, 8),
                                 ),
@@ -604,22 +616,37 @@ class _HomeScreenState extends State<HomeScreen> {
                               onPressed: () async {
                                 final result = await Navigator.of(context).push(
                                   PageRouteBuilder(
-                                    pageBuilder: (context, animation, secondaryAnimation) => 
-                                        RequestScreen(selectedDate: _selectedDay!),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      const begin = Offset(1.0, 0.0);
-                                      const end = Offset.zero;
-                                      const curve = Curves.easeInOut;
-                                      final tween = Tween(begin: begin, end: end)
-                                          .chain(CurveTween(curve: curve));
-                                      return SlideTransition(
-                                        position: animation.drive(tween),
-                                        child: child,
-                                      );
-                                    },
+                                    pageBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                        ) => RequestScreen(
+                                          selectedDate: _selectedDay!,
+                                        ),
+                                    transitionsBuilder:
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                          child,
+                                        ) {
+                                          const begin = Offset(1.0, 0.0);
+                                          const end = Offset.zero;
+                                          const curve = Curves.easeInOut;
+                                          final tween = Tween(
+                                            begin: begin,
+                                            end: end,
+                                          ).chain(CurveTween(curve: curve));
+                                          return SlideTransition(
+                                            position: animation.drive(tween),
+                                            child: child,
+                                          );
+                                        },
                                   ),
                                 );
-                                if (result != null && result is Map<String, DateTime>) {
+                                if (result != null &&
+                                    result is Map<String, DateTime>) {
                                   setState(() {
                                     _candidates.add(result);
                                   });
@@ -630,7 +657,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      
+
                       // 予定一覧
                       const Text(
                         '予定',
@@ -643,9 +670,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 10),
                       ..._getEventsForDay(_selectedDay!).map((e) {
                         final dateTime = e.start?.dateTime?.toLocal();
-                        final isAllDay = e.start?.date != null && e.start?.dateTime == null;
+                        final isAllDay =
+                            e.start?.date != null && e.start?.dateTime == null;
                         final summary = e.summary ?? 'タイトルなし';
-                        
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 8),
                           padding: const EdgeInsets.all(12),
@@ -682,8 +710,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                     if (dateTime != null || isAllDay)
                                       Text(
-                                        dateTime != null 
-                                            ? DateFormat('HH:mm').format(dateTime)
+                                        dateTime != null
+                                            ? DateFormat(
+                                                'HH:mm',
+                                              ).format(dateTime)
                                             : '終日',
                                         style: TextStyle(
                                           fontSize: 14,
@@ -697,7 +727,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         );
                       }),
-                      
+
                       if (_getEventsForDay(_selectedDay!).isEmpty)
                         Container(
                           padding: const EdgeInsets.all(16),
@@ -723,9 +753,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                      
+
                       const SizedBox(height: 20),
-                      
+
                       // 候補日一覧
                       const Text(
                         '追加した候補日',
@@ -736,46 +766,48 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      
+
                       if (_candidates.isNotEmpty) ...[
-                        ..._candidates.map((c) => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF764ba2).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF764ba2).withOpacity(0.3),
-                              width: 1,
+                        ..._candidates.map(
+                          (c) => Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF764ba2).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFF764ba2).withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF764ba2),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.schedule_rounded,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
+                                  '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2c3e50),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF764ba2),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.schedule_rounded,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
-                                '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF2c3e50),
-                                ),
-                              ),
-                            ],
-                          ),
-                        )),
+                        ),
                         const SizedBox(height: 16),
                         SizedBox(
                           width: double.infinity,
@@ -791,8 +823,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             onPressed: () {
                               final text = _candidates
-                                  .map((c) => '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
-                                      '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}')
+                                  .map(
+                                    (c) =>
+                                        '${DateFormat('M月d日（E）', 'ja').format(c['start']!)}'
+                                        '${DateFormat('H:mm').format(c['start']!)}~${DateFormat('H:mm').format(c['end']!)}',
+                                  )
                                   .join('\n');
                               Clipboard.setData(ClipboardData(text: text));
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -844,7 +879,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
-              
+
               const SizedBox(height: 20),
             ],
           ),

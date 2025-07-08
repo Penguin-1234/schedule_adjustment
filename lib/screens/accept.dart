@@ -143,29 +143,6 @@ class _AcceptScreenState extends State<AcceptScreen>
     return labels[(weekday - 1) % 7];
   }
   
-  // /// 指定日の予定を取得
-  // List<calendar.Event> _getEventsForDay(DateTime day) {
-  //   return widget.allEvents.where((event) {
-  //     final eventStart = event.start?.dateTime?.toLocal() ?? event.start?.date;
-  //     if (eventStart == null) return false;
-
-  //     return eventStart.year == day.year &&
-  //         eventStart.month == day.month &&
-  //         eventStart.day == day.day;
-  //   }).toList();
-  // }
-
-  // /// 候補日時間帯と重なる予定を取得
-  // List<calendar.Event> _getConflictingEvents(DateTimeRange range) {
-  //   return widget.allEvents.where((event) {
-  //     final eventStart = event.start?.dateTime?.toLocal();
-  //     final eventEnd = event.end?.dateTime?.toLocal();
-
-  //     if (eventStart == null || eventEnd == null) return false;
-
-  //     return range.start.isBefore(eventEnd) && eventStart.isBefore(range.end);
-  //   }).toList();
-  // }
   
   /// 指定日の予定を取得
   List<calendar.Event> _getEventsForDay(DateTime day) {
@@ -823,6 +800,7 @@ class _AcceptScreenState extends State<AcceptScreen>
                                     value: Duration(hours: 1),
                                     child: Text('1時間ごと'),
                                   ),
+                                
                                 ],
                                 onChanged: (value) {
                                   if (value != null) {
