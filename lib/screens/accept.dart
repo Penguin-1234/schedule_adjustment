@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'home_screen.dart';
+import 'package:flutter/cupertino.dart';
 
 class AcceptScreen extends StatefulWidget {
   final List<DateTimeRange> busyRanges;
@@ -103,6 +104,38 @@ class _AcceptScreenState extends State<AcceptScreen>
     }
     return slots;
   }
+  // 所要時間ピッカーを表示する関数を作る
+  void _showDurationPicker(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => Container(
+        height: 250,
+        color: Colors.white,
+        child: CupertinoTimerPicker(
+          mode: CupertinoTimerPickerMode.hm,
+          initialTimerDuration: _slotDuration,
+          onTimerDurationChanged: (duration) {
+            setState(() {
+              _slotDuration  = duration;
+            });
+          },
+        ),
+      ),
+    );
+  }
+  //Durationを見やすい文字列に変換するヘルパー関数
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
+    if (hours > 0 && minutes > 0) {
+      return '${hours}時間${minutes}分';
+    } else if (hours > 0) {
+      return '${hours}時間';
+    } else {
+      return '${minutes}分';
+    }
+  }
+
 
   /// 空いている候補日を分割単位ごとに抽出
   void _parseAndFilter() async {
@@ -770,14 +803,74 @@ class _AcceptScreenState extends State<AcceptScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '分割単位:',
+                            '予定の所用時間:',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Colors.grey.shade700,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Container(
+                          // 所要時間表示ボタン
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    content: SizedBox(
+                                      height: 250,
+                                      width: MediaQuery.of(context).size.width * 0.8,
+                                      child: CupertinoTimerPicker(
+                                        mode: CupertinoTimerPickerMode.hm,
+                                        initialTimerDuration: _slotDuration,
+                                        minuteInterval: 15, // 15分刻み
+                                        onTimerDurationChanged: (Duration newDuration) {
+                                          if (newDuration.inMinutes < 15) {
+                                            // 最小15分に制限
+                                            newDuration = const Duration(minutes: 15);
+                                          }
+                                          setState(() {
+                                            _slotDuration = newDuration;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // 閉じる
+                                        },
+                                        child: const Text('閉じる'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.indigo.shade200),
+                              ),
+                              child: Text(
+                                // 表示文字例：1時間15分 など
+                                _formatDuration(_slotDuration),
+                                style: TextStyle(
+                                  color: Colors.indigo.shade700,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                          /*Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
                               vertical: 4,
@@ -794,17 +887,25 @@ class _AcceptScreenState extends State<AcceptScreen>
                                   color: Colors.indigo.shade700,
                                   fontWeight: FontWeight.w500,
                                 ),
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: Duration(minutes: 30),
-                                    child: Text('30分ごと'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: Duration(hours: 1),
-                                    child: Text('1時間ごと'),
-                                  ),
-                                
-                                ],
+                                items: List.generate(20, (index) {
+                                  final duration = Duration(minutes: 15 * (index + 1));
+                                  final hours = duration.inHours;
+                                  final minutes = duration.inMinutes % 60;
+
+                                  String label;
+                                  if (hours > 0 && minutes > 0) {
+                                    label = '$hours時間${minutes}分';
+                                  } else if (hours > 0) {
+                                    label = '$hours時間';
+                                  } else {
+                                    label = '$minutes分';
+                                  }
+
+                                  return DropdownMenuItem<Duration>(
+                                    value: duration,
+                                    child: Text(label),
+                                  );
+                                }),
                                 onChanged: (value) {
                                   if (value != null) {
                                     setState(() {
@@ -812,11 +913,24 @@ class _AcceptScreenState extends State<AcceptScreen>
                                     });
                                   }
                                 },
+
+                                //items: const [
+                                //  DropdownMenuItem(
+                                //    value: Duration(minutes: 30),
+                                //    child: Text('30分'),
+                                //  ),
+                                //  DropdownMenuItem(
+                                //    value: Duration(hours: 1),
+                                //    child: Text('1時間'),
+                                //  ),
+                                //
+                                //],
+                                
                               ),
                             ),
                           ),
                         ],
-                      ),
+                      ),*/
                       const SizedBox(height: 20),
 
                       // 解析ボタン

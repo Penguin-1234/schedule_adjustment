@@ -650,7 +650,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
-
+                    
+                    //予定の文字を表示
                     const Text(
                       '予定',
                       style: TextStyle(
@@ -664,6 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       final dateTime = e.start?.dateTime?.toLocal();
                       final isAllDay = e.start?.date != null && e.start?.dateTime == null;
                       final summary = e.summary ?? 'タイトルなし';
+                      final location = e.location; // ← 場所の情報を追加
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
@@ -709,6 +711,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: Colors.grey[600],
                                       ),
                                     ),
+                                  if (location != null && location.isNotEmpty) // ← 場所がある場合のみ表示
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.place,
+                                          size: 16,
+                                          color: Colors.grey[700],
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            location,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey[700],
+                                            ),
+                                            overflow: TextOverflow.ellipsis, // 長すぎる場所名を省略表示
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                 ],
                               ),
                             ),
@@ -751,7 +774,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           final result = await Navigator.of(context).push(
                             PageRouteBuilder(
                               pageBuilder: (context, animation, secondaryAnimation) =>
-                                  RequestScreen(selectedDate: _selectedDay!),
+                                  RequestScreen(selectedDate: _selectedDay!, events: _getEventsForDay(_selectedDay!),),
                               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                 const begin = Offset(1.0, 0.0);
                                 const end = Offset.zero;
