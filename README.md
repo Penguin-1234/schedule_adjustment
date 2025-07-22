@@ -1,16 +1,11 @@
-# schedule_adjustment
+# スケジュール調整アプリ
+Flutterで開発した先生と生徒のスケジュール調整用のウェブアプリです。生徒側はカレンダーで予定を確認し、希望の日にちを先生に送信します。先生側は生徒から送られてきた日付を貼り付けると自動で予定の空いている中から授業時間を提案してくれます。
 
-A new Flutter project.
+#主な機能
+・Googleカレンダーの表示
+・希望日時のテキスト出力、コピー
+・生徒の希望日時を貼り付け、自動で空き予定と照合し、授業時間の提案
 
-## Getting Started
+#使用技術
+Flutter
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
